@@ -3,18 +3,8 @@ import { createModalFields, createRow } from "@magicyan/discord";
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextInputStyle } from "discord.js";
 import { fetchProductStock, fetchProductData } from "../../../functions/utils/common.js";
 import  moment  from "moment";
-import { z } from "zod";
 
 
-const schema = z.object({
-    productName: z.string().min(1, { message: "O nome do produto é obrigatório" }),
-    quantity: z.string().min(1, { message: "A quantidade e local de entrega é obrigatória" }),
-    nameClient: z.string().min(1, { message: "O nome do cliente é obrigatório" }),
-    portUrgency: z.string().min(1, { message: "O porte do cliente e a urgência são obrigatórios" }),
-    observations: z.string().min(1, { message: "A observação é obrigatória" }),
-});
-
- 
 
 new Responder({
     customId: "compras",
@@ -156,87 +146,3 @@ new Responder({
 });
 
 
-new Responder({
-    customId: "novos",
-    type: ResponderType.Button,
-    cache: "cached",
-    async run(interaction) {
-        interaction.showModal({
-            title: "Solicitar novos produtos",
-            customId: "modalNewProd",
-            components: createModalFields({
-                nameClient: {
-                    label: "Nome do cliente / Solicitante",
-                    placeholder: "Nome do cliente / Solicitante",
-                    style: TextInputStyle.Short,
-                    required: true,
-                },
-                portUrgency: {
-                    label: "Porte e urgência",
-                    placeholder: "Porte e urgência",
-                    style: TextInputStyle.Short,
-                    required: true,
-                },
-                productName: {
-                    label: "Nome do produto",
-                    placeholder: "Nome do produto",
-                    style: TextInputStyle.Short,
-                    required: true,
-                },
-                quantity: {
-                    label: "Quantidade e Local de entrega",
-                    placeholder: "Quantidade e Local de entrega",
-                    style: TextInputStyle.Short,
-                    required: true,
-                },
-                observations: {
-                    label: "Observação",
-                    placeholder: "Observação",
-                    style: TextInputStyle.Paragraph,
-                    required: true,
-                },
-            }),
-        });
-    },
-});
-
-
-new Responder({
-    customId: "modalNewProd",
-    type: ResponderType.ModalComponent,
-    cache: "cached",
-    async run(interaction) {
-        if (!interaction.isModalSubmit()){
-            console.log('Erro: interaction is not a ModalSubmitInteraction');
-            return;
-        } 
-        await interaction.deferReply({ ephemeral: true });
-        if (!interaction.fields) {
-            return interaction.reply({ content: 'Não foi possível obter os campos do formulário.', ephemeral: true });
-        }
-
-        const nameClient = interaction.fields.getTextInputValue("nameClient");
-        const portUrgency = interaction.fields.getTextInputValue("portUrgency");
-        const productName = interaction.fields.getTextInputValue("productName");
-        const quantity = interaction.fields.getTextInputValue("quantity");
-        const observations = interaction.fields.getTextInputValue("observations");
-
-        if (!productName || !quantity || !nameClient || !portUrgency || !observations) {
-            return interaction.editReply({ content: 'Preencha todos os campos do formulário.' });
-        }
-        const modalData = {
-            nameClient,
-            portUrgency,
-            productName,
-            quantity,
-            observations,
-        };
-
-        const validation = schema.safeParse(modalData);
-
-        if (!validation.success) {
-            const errorMessages = validation.error.errors.map((err) => err.message).join("\n");
-            return interaction.editReply({ content: `Erro de validação:\n${errorMessages}` });
-        }
-    }
-})
