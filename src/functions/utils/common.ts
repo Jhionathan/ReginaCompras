@@ -15,10 +15,21 @@ export async function fetchProductStock(productCode: number) {
             connectString: process.env.DB_HOST
         });
         const result = await connection.execute(
-            `SELECT P.CODPROD, P.DESCRICAO, SUM(E.QTESTGER - E.QTRESERV - E.QTBLOQUEADA - E.QTPENDENTE - E.QTFRENTELOJA) AS QTDREAL
-            FROM PCEST E INNER JOIN PCPRODUT P ON P.CODPROD = E.CODPROD 
-            WHERE E.CODFILIAL = 1 AND P.CODPROD = :productCode 
-            GROUP BY P.CODPROD, P.DESCRICAO`,
+            `SELECT
+                P.CODPROD,
+                P.DESCRICAO,
+                SUM(NVL(E.QTESTGER, 0) - NVL(E.QTRESERV, 0) - NVL(E.QTBLOQUEADA,  0) - NVL(E.QTPENDENTE, 0) - NVL(E.QTFRENTELOJA, 0)) AS QTDREAL,
+            FROM
+                PCEST E
+            INNER JOIN PCPRODUT P ON
+                P.CODPROD = E.CODPROD
+            WHERE
+                E.CODFILIAL = 1
+                AND P.CODPROD = :productCode
+                AND P.OBS2 <> 'FL'
+            GROUP BY
+            P.CODPROD,
+            P.DESCRICAO,`,
             [productCode]
         );
         return result.rows as any[];
@@ -51,6 +62,7 @@ export async function fetchProductPrev(productCode: number) {
             WHERE I.QTENTREGUE = 0 AND I.CODPROD = :productCode`,
             [productCode]
         );
+        console.log('✔ Modal component prevChegada responder loaded!');
         return result.rows as any[];
     } catch (err) {
         console.error('Erro ao consultar o banco de dados Oracle:', err);
