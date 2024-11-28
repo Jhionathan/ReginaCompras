@@ -43,7 +43,6 @@ new Responder({
     }
 })
 
-
 new Responder({
     customId: "previsao",
     type: ResponderType.Button, cache: "cached",

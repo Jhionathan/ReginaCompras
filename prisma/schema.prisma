@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,12 +8,30 @@ datasource db {
 }
 
 model solicitacao {
-  id              Int      @id @default(autoincrement())  // Chave primária com auto-incremento
-  requester       String                                    // Nome do solicitante
-  subtitle        String                                   // Assunto do chamado
-  description     String                                   // Descrição do chamado
-  createdAt       DateTime @default(now())                 // Data de criação com valor padrão para a data atual
-  finishedAt      DateTime?                                // Data de finalização do chamado
-  finishedByUser  String?                                  // Usuário que encerrou o chamado
-  updatedAt       DateTime @updatedAt                      // Atualiza automaticamente na alteração
+  id             Int       @id @default(autoincrement())
+  requester      String
+  subtitle       String
+  description    String
+  ticket         String    @unique
+  typeproblem    String
+  createdAt      DateTime  @default(now())
+  finishedAt     DateTime?
+  finishedByUser String?
+  updatedAt      DateTime  @updatedAt
+}
+
+model novos_produtos {
+  id                  Int       @id @default(autoincrement())
+  requester           String
+  ticket              String    @unique
+  typeproblem         String
+  nameClient          String
+  portUrgency         String?
+  nameProduct         String
+  quantityAndDelivery String
+  observation         String
+  createdAt           DateTime  @default(now())
+  finishedAt          DateTime?
+  finishedByUser      String?
+  updatedAt           DateTime  @updatedAt
 }

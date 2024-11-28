@@ -1,12 +1,18 @@
 import { Responder, ResponderType } from "#base";
-import { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextChannel, Routes, EmbedBuilder, TextInputStyle, REST } from "discord.js";
+import { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextChannel, Routes, TextInputStyle, REST } from "discord.js";
 import { ThreadsAPI } from "../../../api/thread.js";
 import { APIChannel } from "discord-api-types/v10";
 import { PrismaClient } from "@prisma/client";
 
 const RESTInstance = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 const threadsAPI = new ThreadsAPI(RESTInstance);
-const cargoId = "1310664105610444820";
+const cargoId = "1293641175932080188";
+
+export function gerarNumeroTicket(): string {
+    const timestamp = Date.now(); 
+    const ticketNumber = `${timestamp}`;
+    return ticketNumber;
+}
 
 new Responder({
     customId: "falar",
@@ -55,8 +61,10 @@ new Responder({
             const assunto = interaction.fields.getTextInputValue("assunto");
             const descricao = interaction.fields.getTextInputValue("descricao");
 
-            const threadTitle = `🚨🎫 Usuário: ${interaction.user.globalName}`;
-            const channelThreads = "1298349477429645352";
+            const numeroTicket = gerarNumeroTicket();
+
+            const threadTitle = `🚨🛍️ SC - User: ${interaction.user.globalName} - ${numeroTicket}`;
+            const channelThreads = "1311319571420020777";
 
             const thread = await RESTInstance.post(Routes.threads(channelThreads), {
                 body: {
@@ -72,7 +80,10 @@ new Responder({
             const threadChannel = await interaction.client.channels.fetch(threadId) as TextChannel;
             if (threadChannel) {
                 await threadChannel.send(
-                    `<@&${cargoId}> \nUma nova Solicitação foi aberta por **${interaction.user.globalName}**. 🛍️\n**Assunto:** ${assunto}.\n**Descrição:** ${descricao}`
+                    `<@&${cargoId}> 
+                    \n📌 Uma nova Solicitação foi aberta por **${interaction.user.globalName}**. 🛍️
+                    \n📃 **Assunto:** ${assunto}.
+                    \n📃 **Descrição:** ${descricao}`
                 );
             }
 
@@ -82,11 +93,13 @@ new Responder({
                     requester: interaction.user.globalName as string,
                     subtitle: assunto,
                     description: descricao,
+                    typeproblem: "FalarCompras",
+                    ticket: numeroTicket
                 },
             });
             console.log(solicitacao);
 
-            const channel = await interaction.client.channels.fetch("1298349477429645352") as TextChannel;
+            const channel = await interaction.client.channels.fetch("1311319571420020777") as TextChannel;
             if (channel) {
                 await channel.send(
                     `**Thread criada:** ${threadTitle}\n **Descrição:** ${descricao}\n **Data de criação:** ${new Date()}`

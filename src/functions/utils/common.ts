@@ -1,7 +1,9 @@
 import oracledb from "oracledb";
 
-
+// PARA WINDOWS
 oracledb.initOracleClient({ libDir: 'C:\\instantclient\\instantclient_23_5' });
+
+// PARA UBUNTU
 // oracledb.initOracleClient({ libDir: '/bot/instantclient' });
 
 
