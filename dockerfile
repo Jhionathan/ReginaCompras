@@ -1,11 +1,16 @@
+# Use a versão específica do Node.js
 FROM docker.io/library/node:21.5
- 
+
+# Definir o diretório de trabalho
 WORKDIR /bot
 
+# Copiar o Oracle Instant Client
 COPY instantclient-basic.zip /bot/instantclient-basic.zip
 
+# Instalar dependências necessárias
 RUN apt-get update && apt-get install -y libaio1 unzip curl && rm -rf /var/lib/apt/lists/*
 
+# Configurar o Oracle Instant Client
 RUN unzip /bot/instantclient-basic.zip && \
     rm /bot/instantclient-basic.zip && \
     mv instantclient_* instantclient && \
@@ -14,17 +19,25 @@ RUN unzip /bot/instantclient-basic.zip && \
     echo /bot/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf && \
     ldconfig
 
+# Configurar o path da biblioteca Oracle
 ENV LD_LIBRARY_PATH=/bot/instantclient:$LD_LIBRARY_PATH
- 
-COPY ./package*.json .
+
+# Copiar arquivos necessários para a aplicação
+COPY ./package*.json ./
+COPY .env .env
+COPY prisma ./prisma
+
+# Instalar dependências do projeto
 RUN npm install
- 
+
+# Gerar os artefatos do Prisma
+RUN npx prisma generate --schema ./prisma/schema.prisma
+
+# Copiar o restante dos arquivos do projeto
 COPY . .
 
-COPY .env .env
-
-RUN npx prisma generate
- 
+# Construir a aplicação
 RUN npm run build
- 
+
+# Comando para rodar a aplicação
 CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

@@ -63,7 +63,7 @@ new Responder({
 
             const numeroTicket = gerarNumeroTicket();
 
-            const threadTitle = `🚨🛍️ SC - User: ${interaction.user.globalName} - ${numeroTicket}`;
+            const threadTitle = `🚨🛒 SC - User: ${interaction.user.globalName} - ${numeroTicket}`;
             const channelThreads = "1311319571420020777";
 
             const thread = await RESTInstance.post(Routes.threads(channelThreads), {
@@ -88,16 +88,20 @@ new Responder({
             }
 
             // Enviar chamado para o banco apos a seleção
-            const solicitacao = await prisma.solicitacao.create({
-                data: {
-                    requester: interaction.user.globalName as string,
-                    subtitle: assunto,
-                    description: descricao,
-                    typeproblem: "FalarCompras",
-                    ticket: numeroTicket
-                },
-            });
-            console.log(solicitacao);
+            try {
+                const solicitacao = await prisma.solicitacao.create({
+                    data: {
+                        requester: interaction.user.globalName as string,
+                        subtitle: assunto,
+                        description: descricao,
+                        typeproblem: "FalarCompras",
+                        ticket: numeroTicket
+                    },
+                });
+                console.log(solicitacao);
+            } catch (error) {
+                console.error("Erro ao criar solicitacao no banco:", error);
+            }
 
             const channel = await interaction.client.channels.fetch("1311319571420020777") as TextChannel;
             if (channel) {

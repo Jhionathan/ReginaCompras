@@ -88,7 +88,7 @@ new Responder({
 
             const numeroTicket = gerarNumeroTicket();
 
-            const threndTitle = `🚨🎫 NP - User: ${interaction.user.globalName} - ${numeroTicket}`;
+            const threndTitle = `🚨📦 NP - User: ${interaction.user.globalName} - ${numeroTicket}`;
             const channelThrend = '1311319138177650708';
 
             const thread = await RESTInstance.post(Routes.threads(channelThrend), {
@@ -130,7 +130,7 @@ new Responder({
             });
             console.log(SolicitacaoNovosProdutos);
 
-            const channel = await interaction.client.channels.fetch("1298349477429645352") as TextChannel;
+            const channel = await interaction.client.channels.fetch("1311319138177650708") as TextChannel;
             if (channel) {
                 await channel.send(
                     `**Thread criada:** ${threndTitle}\n **Produto:** ${productNameInput}\n **Data de Solicitação:** ${new Date()}`

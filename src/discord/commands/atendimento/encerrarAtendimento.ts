@@ -34,7 +34,7 @@ new Command({
             // Envia uma resposta imediata ao usuário
             await interaction.reply({
                 content:
-                    "✅ ***O assunto a ser tratado no chamado foi concluído*** ✅\n\n **Esse chamado será encerrado. ❎**\nObrigado pela atenção.",
+                    "✅🛒 ***O assunto a ser tratado na solicitação foi concluída*** 🛒✅\n\n **Essa solicitação será encerrada. ❎**\nObrigado pela atenção.",
                 ephemeral: false,
             });
 
