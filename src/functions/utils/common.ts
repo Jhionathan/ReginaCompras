@@ -15,10 +15,9 @@ export async function fetchProductStock(productCode: number) {
             connectString: process.env.DB_HOST
         });
         const result = await connection.execute(
-            `SELECT
-                P.CODPROD,
-                P.DESCRICAO,
-                SUM(NVL(E.QTESTGER, 0) - NVL(E.QTRESERV, 0) - NVL(E.QTBLOQUEADA,  0) - NVL(E.QTPENDENTE, 0) - NVL(E.QTFRENTELOJA, 0)) AS QTDREAL,
+            `SELECT P.CODPROD,
+                	P.DESCRICAO,
+                	SUM(NVL(E.QTESTGER, 0) - NVL(E.QTRESERV, 0) - NVL(E.QTBLOQUEADA,  0) - NVL(E.QTPENDENTE, 0) - NVL(E.QTFRENTELOJA, 0)) AS QTDREAL
             FROM
                 PCEST E
             INNER JOIN PCPRODUT P ON
@@ -29,7 +28,7 @@ export async function fetchProductStock(productCode: number) {
                 AND P.OBS2 <> 'FL'
             GROUP BY
             P.CODPROD,
-            P.DESCRICAO,`,
+            P.DESCRICAO`,
             [productCode]
         );
         return result.rows as any[];
