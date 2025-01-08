@@ -1,6 +1,6 @@
 import oracledb from "oracledb";
 
-// PARA WINDOWS
+// // PARA WINDOWS
 // oracledb.initOracleClient({ libDir: 'C:\\instantclient\\instantclient_23_5' });
 
 // PARA UBUNTU
@@ -20,7 +20,7 @@ export async function fetchProductStock(productCode: number) {
             `SELECT
                 P.CODPROD,
                 P.DESCRICAO,
-                SUM(NVL(E.QTESTGER, 0) - NVL(E.QTRESERV, 0) - NVL(E.QTBLOQUEADA,  0) - NVL(E.QTPENDENTE, 0) - NVL(E.QTFRENTELOJA, 0)) AS QTDREAL,
+                SUM(NVL(E.QTESTGER, 0) - NVL(E.QTRESERV, 0) - NVL(E.QTBLOQUEADA,  0) - NVL(E.QTPENDENTE, 0) - NVL(E.QTFRENTELOJA, 0)) AS QTDREAL
             FROM
                 PCEST E
             INNER JOIN PCPRODUT P ON
@@ -31,7 +31,7 @@ export async function fetchProductStock(productCode: number) {
                 AND P.OBS2 <> 'FL'
             GROUP BY
             P.CODPROD,
-            P.DESCRICAO,`,
+            P.DESCRICAO`,
             [productCode]
         );
         return result.rows as any[];
@@ -45,6 +45,44 @@ export async function fetchProductStock(productCode: number) {
     }
 }
 
+export async function fetchFrenteDeLoja(productCode: number) {
+    let connection;
+    try {
+        console.log('Connecting to Oracle database...');
+        connection = await oracledb.getConnection({
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            connectString: process.env.DB_HOST
+        });
+        const result = await connection.execute(
+            `SELECT
+                P.CODPROD,
+                P.DESCRICAO,
+                NVL(E.QTFRENTELOJA, 0) AS QTFRENTELOJA 
+            FROM
+                PCEST E
+            INNER JOIN PCPRODUT P ON
+                P.CODPROD = E.CODPROD
+            WHERE
+                E.CODFILIAL = 1
+                AND P.CODPROD =:productCode
+                AND P.OBS2 <> 'FL'
+            GROUP BY
+            P.CODPROD,
+            P.DESCRICAO,
+            E.QTFRENTELOJA`,
+            [productCode]
+        );
+        return result.rows as any[];
+    } catch (err) {
+        console.error('Erro ao consultar o banco de dados Oracle no fetchFrenteDeLoja:', err);
+        throw err;
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
 
 export async function fetchProductPrev(productCode: number) {
     let connection;

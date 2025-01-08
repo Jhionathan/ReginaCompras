@@ -35,3 +35,19 @@ model novos_produtos {
   finishedByUser      String?
   updatedAt           DateTime  @updatedAt
 }
+
+model reposicao_produtos {
+  id                  Int       @id @default(autoincrement())
+  requester           String
+  ticket              String    @unique
+  typeproblem         String
+  nameClient          String
+  codProd             String
+  nameProduct         String
+  quantityAndDelivery String
+  observation         String
+  createdAt           DateTime  @default(now())
+  finishedAt          DateTime?
+  finishedByUser      String?
+  updatedAt           DateTime  @updatedAt
+}

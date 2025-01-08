@@ -1,62 +1,16 @@
 import { Responder, ResponderType } from "#base";
-import { createModalFields, createRow } from "@magicyan/discord";
-import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextInputStyle } from "discord.js";
-import { fetchProductStock, fetchProductData } from "../../../functions/utils/common.js";
-import moment from "moment";
+import { createModalFields } from "@magicyan/discord";
+import { EmbedBuilder, TextInputStyle } from "discord.js";
+import { fetchFrenteDeLoja } from "../../../functions/utils/common.js";
+
 
 new Responder({
-    customId: "compras",
-    type: ResponderType.Button,
-    run: (interaction) => {
-        const embend = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setThumbnail('https://r3suprimentos.com/_next/image?url=%2Flogo-color.png&w=64&q=75')
-            .setFields(
-                { name: '**Compras** 🛒', value: '\nEscolha alguma das opções abaixo: ⬇️' },
-            )
-            .setTimestamp()
-            .setFooter({ text: 'Data de consulta' });
-            
-                    
-        const buttonPrevisao = createRow(
-            new ButtonBuilder()
-                .setCustomId("previsao")
-                .setLabel("📦 ───▸ Previsão de Chegada ◂─── 📦")
-                .setStyle(ButtonStyle.Primary)
-        )
-                
-        const buttonNovos = createRow(
-            new ButtonBuilder()
-                .setCustomId("novos")
-                .setLabel("🏷️ ─▸ Solicitar Novos Produtos ◂─ 🏷️")
-                .setStyle(ButtonStyle.Primary)
-        )
-
-        const buttonFalar = createRow(
-            new ButtonBuilder()
-                .setCustomId("falar")
-                .setLabel("🛍️ ───▸Falar com o Compras◂─── 🛍️")
-                .setStyle(ButtonStyle.Primary)
-        )
-        
-        const buttonConsultaLoja = createRow(
-            new ButtonBuilder()
-                .setCustomId("consultaLoja")
-                .setLabel("🏪 ──▸ Consultar Estoque Loja ◂── 🏪")
-                .setStyle(ButtonStyle.Primary)
-        )
-
-        interaction.reply({ embeds: [embend], ephemeral: true, components: [buttonPrevisao, buttonNovos, buttonFalar, buttonConsultaLoja] });
-    }
-})
-
-new Responder({
-    customId: "previsao",
+    customId: "consultaLoja",
     type: ResponderType.Button, cache: "cached",
     async run(interaction) {
         interaction.showModal({
-            title: "Previsão de Chegada 📦",
-            customId: "prevChegada",
+            title: "Consultar estoque da Loja 🏪📦",
+            customId: "consultaLojaModal",
             components: createModalFields({
                 product: {
                     label: "Codigo do Produto",
@@ -70,7 +24,7 @@ new Responder({
 
 
 new Responder({
-    customId: "prevChegada",
+    customId: "consultaLojaModal",
     type: ResponderType.ModalComponent, cache: "cached",
 
 
@@ -82,12 +36,11 @@ new Responder({
             return;
         }
         try {
-            const rows = await fetchProductData(parseInt(productCode));
-            const stock = await fetchProductStock (parseInt(productCode));
+            const stock = await fetchFrenteDeLoja (parseInt(productCode));
             const codProduto = stock[0][0];
             const descriptionProduc = stock[0][1];
-            const qtdStock = stock[0][2]; 
-            if (!rows || rows.length === 0 || !stock || stock.length === 0) {
+            const qtdStock = stock[0][2];
+            if (!stock || qtdStock === 0) {
                 const embendFail = new EmbedBuilder()
                     .setColor('#ED4245')
                     .setTitle("Produtos R3 Suprimentos")
@@ -103,7 +56,7 @@ new Responder({
                         inline: false
                     })
                     .addFields({
-                        name: 'Estoque Atual',
+                        name: 'Estoque Frente de Loja',
                         value: qtdStock.toString(),
                         inline: false
                     })
@@ -116,18 +69,15 @@ new Responder({
                 interaction.reply({ embeds: [embendFail], content: `Entre em contato com o setor de compras ${channel}`, ephemeral: true })
                 return;
             } else {
-                const dataPrevisao = moment(rows[0][0]).format('DD/MM/YYYY');
-                const description = rows[0][1];
-                const qtPedido = rows[0][2].toString();
-                const codProduto = rows[0][3].toString();
 
                 const embend = new EmbedBuilder()
                     .setColor(0x0099FF)
+                    .setTitle("Produtos R3 Suprimentos")
                     .setThumbnail('https://r3suprimentos.com/_next/image?url=%2Flogo-color.png&w=64&q=75')
                     .setImage(`https://r3suprimentos.agilecdn.com.br/${codProduto}.jpg`)
                     .addFields({
-                        name: 'O Produto',
-                        value: description,
+                        name: 'Nome do Produto',
+                        value: descriptionProduc.toString(),
                         inline: false
                     })
                     .addFields({
@@ -136,17 +86,7 @@ new Responder({
                         inline: false
                     })
                     .addFields({
-                        name: 'Data de Previsão',
-                        value: dataPrevisao,
-                        inline: false
-                    })
-                    .addFields({
-                        name: 'Quantidade Pedida',
-                        value: qtPedido,
-                        inline: false
-                    })
-                    .addFields({
-                        name: 'Estoque Atual',
+                        name: 'Estoque Frente de Loja',
                         value: qtdStock.toString(),
                         inline: false
                     })

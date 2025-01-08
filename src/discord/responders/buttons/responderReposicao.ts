@@ -12,7 +12,7 @@ import { gerarNumeroTicket } from "./responderTalkBuyers.js";
 const RESTInstance = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 const threadsAPI = new ThreadsAPI(RESTInstance);
 const cargoId = "1293641175932080188";
-const channelThreadId = '1311319138177650708';
+const channelThreadId = '1326259010265026620';
 
 new Responder({
     customId: "novos",
@@ -20,36 +20,36 @@ new Responder({
     cache: "cached",
     async run(interaction) {
         interaction.showModal({
-            title: "Solicitar novos produtos",
-            customId: "modalNewProd",
+            title: "Solicitar Reposição de Produtos",
+            customId: "modalReplaceProd",
             components: createModalFields({
                 nameClient: {
                     label: "👤 Nome do cliente / Solicitante",
-                    placeholder: "Nome do cliente / Solicitante",
-                    style: TextInputStyle.Short,
-                    required: true,
-                },
-                portUrgency: {
-                    label: "🚨 Porte e urgência",
-                    placeholder: "Porte e urgência",
+                    placeholder: "Digite o nome do cliente / Solicitante",
                     style: TextInputStyle.Short,
                     required: true,
                 },
                 productName: {
                     label: "🏷️ Nome do produto",
-                    placeholder: "Nome do produto",
+                    placeholder: "Digite o nome do produto",
+                    style: TextInputStyle.Short,
+                    required: true,
+                },
+                codProd: {
+                    label: "🔢 Código do Produto",
+                    placeholder: "3200",
                     style: TextInputStyle.Short,
                     required: true,
                 },
                 quantity: {
-                    label: "🚚 Quantidade e Local de entrega",
-                    placeholder: "Quantidade e Local de entrega",
+                    label: "🚚 Demanda",
+                    placeholder: "Demanda",
                     style: TextInputStyle.Short,
                     required: true,
                 },
                 observations: {
                     label: "📝 Observação",
-                    placeholder: "Observação",
+                    placeholder: "Digite a observação",
                     style: TextInputStyle.Paragraph,
                     required: true,
                 },
@@ -61,7 +61,7 @@ new Responder({
 const prisma = new PrismaClient();
 
 new Responder({
-    customId: "modalNewProd",
+    customId: "modalReplaceProd",
     type: ResponderType.ModalComponent,
     cache: "cached",
     async run(interaction: ModalSubmitInteraction<"cached">) {
@@ -70,8 +70,8 @@ new Responder({
             await interaction.deferReply({ ephemeral: true });
 
             const nameClientInput = interaction.fields.getTextInputValue("nameClient");
-            const portUrgencyInput = interaction.fields.getTextInputValue("portUrgency");
             const productNameInput = interaction.fields.getTextInputValue("productName");
+            const codProdInput = interaction.fields.getTextInputValue("codProd");
             const quantityInput = interaction.fields.getTextInputValue("quantity");
             const observationsInput = interaction.fields.getTextInputValue("observations");
 
@@ -96,19 +96,19 @@ new Responder({
                     `<@&${cargoId}> 
                     \n📌Uma nova Solicitação para novos produtos foi feita por **${interaction.user.globalName}**.
                     \n\n🏷️**Produto:** ${productNameInput}.
+                    \n🔢**Código do Produto:** ${codProdInput}
                     \n👤**Cliente:** ${nameClientInput}
-                    \n🚨**Porte e Urgência:** ${portUrgencyInput}
                     \n🚚**Quantidade e Local de entrega:** ${quantityInput}
                     \n📝**Observação:** ${observationsInput}`
                 );
             }
 
             // Enviar chamado para o banco apos a seleção
-            const SolicitacaoNovosProdutos = await prisma.novos_produtos.create({
+            const SolicitacaoNovosProdutos = await prisma.reposicao_produtos.create({
                 data: {
                     requester: interaction.user.globalName as string,
                     nameClient: nameClientInput,
-                    portUrgency: portUrgencyInput,
+                    codProd: codProdInput,
                     nameProduct: productNameInput,
                     quantityAndDelivery: quantityInput,
                     observation: observationsInput,
