@@ -8,7 +8,7 @@ new Command({
     description: "Envie isso para abrir um novo Chamado 🎫",
     type: ApplicationCommandType.ChatInput,
     async run(interaction) {
-        const allowedRoleId = "1288150802283757599"; // Substitua pelo ID do cargo permitido
+        const allowedRoleId = "1310664105610444820"; // Substitua pelo ID do cargo permitido
 
             // Verifica se o usuário tem o cargo permitido
             const member = interaction.member;
@@ -28,9 +28,9 @@ new Command({
         // Criar o embed
         const embed = createEmbed({
             title: "**🛍️ Solicitar Atendimento para a REGINA-COMPRAS 🤖✨🛒**",
-            description: "**Iniciando um Atendimento:** 🎫\n\nPara utilizar o atendimento do Compras, clique no botão " + "Atendimento Compras 🛒" + " e selecione a opção desejada. As opções disponíveis são as seguintes:\n\n**Previsão de Chegada:** ✅\n\nAo clicar nesta opção, será aberto um formulário onde você poderá digitar o código do produto para saber a previsão de chegada.\n\n**Novos Produtos:** 🛍️\n\nAo selecionar esta opção, será aberto um formulário que, ao ser preenchido, criará um canal de texto onde você poderá conversar diretamente com o setor de Compras.\n\n**Falar com o Compras 🛒**\n\nAo clicar neste botão, será criado um canal de texto para você conversar diretamente com o setor de Compras, caso nenhuma das opções anteriores atenda à sua necessidade.\n\nEstamos aqui para facilitar o seu atendimento e ajudar você a resolver suas demandas com agilidade! 🏆✨\n\n👇🏼 Clique no botão 'Atendimento Compras 🛒' para começar.",
+            description: "**Iniciando um Atendimento:** 🎫\n\nPara utilizar o atendimento do Compras, clique no botão " + "Atendimento Compras 🛒" + " e selecione a opção desejada. As opções disponíveis são as seguintes:\n\n**Previsão de Chegada**: ✅\n\nAo clicar nesta opção, será aberto um formulário onde você poderá digitar o código do produto para saber a previsão de chegada.\n\n**Reposição de Produtos:** 🔁\n\nAo selecionar esta opção, será aberto um formulário que deve ser preenchido para solicitar reposição de produtos. Após isso será criado um canal de texto privado onde você poderá conversar diretamente com o setor de Compras.\n\n**Novos Produtos:** 🛍️\n\nAo selecionar esta opção, será aberto um formulário que deve ser preenchido para solicitar novos produtos que não estão cadastrados no sistema. Após isso será criado um canal de texto privado onde você poderá conversar diretamente com o setor de Compras.\n\n**Falar com o Compras:** 🛒\n\nCaso nenhuma das opções anteriores atenda à sua necessidade, ao clicar neste botão, será criado um canal de texto privado para você conversar diretamente com o setor de Compras.\n\n**Consultar Estoque Loja:** 🏪\n\nAo clicar nesse botão, aparecerá um campo no qual vc digita o codigo do produto que quer consultar o estoque da loja\n\nEstamos aqui para facilitar o seu atendimento e ajudar você a resolver suas demandas com agilidade! 🏆✨\n\n👇🏼 Clique no botão 'Atendimento Compras 🛒' para começar.",
             color: "#3b82f6", // Cor verde
-            url: "https://discord.com/channels/1285697402409582736/1309574068395315240" // URL do canal
+            url: "https://discord.com/channels/1298349395091132458/1344314645107965975" // URL do canal
         });
 
         // Botão para abrir um novo chamado
@@ -50,7 +50,7 @@ new Command({
             .addComponents(button);
 
         // Enviar o embed para um canal específico (use o ID real do canal)
-        const channel = await interaction.client.channels.fetch("1309574068395315240") as TextChannel;
+        const channel = await interaction.client.channels.fetch("1344314645107965975") as TextChannel;
         if (channel) {
             const sentMessage = await channel.send({ embeds: [embed], components: [row] });
 

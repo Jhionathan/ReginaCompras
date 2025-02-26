@@ -1,13 +1,13 @@
 import oracledb from "oracledb";
 
-// // PARA WINDOWS
-// oracledb.initOracleClient({ libDir: 'C:\\instantclient\\instantclient_23_5' });
+// PARA WINDOWS
+oracledb.initOracleClient({ libDir: 'C:\\instantclient\\instantclient_23_5' });
 
-// PARA UBUNTU
-oracledb.initOracleClient({ libDir: '/bot/instantclient' });
+// // PARA UBUNTU
+// oracledb.initOracleClient({ libDir: '/bot/instantclient' });
 
 
-export async function fetchProductStock(productCode: number) {
+export async function fetchEstoque(productCode: number) {
     let connection;
     try {
         console.log('Connecting to Oracle database...');

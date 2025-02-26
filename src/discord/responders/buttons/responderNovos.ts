@@ -11,8 +11,8 @@ import { gerarNumeroTicket } from "./responderTalkBuyers.js";
 
 const RESTInstance = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 const threadsAPI = new ThreadsAPI(RESTInstance);
-const cargoId = "1293641175932080188";
-const channelThreadId = '1311319138177650708';
+const cargoId = "1310664105610444820";
+const channelThreadId = '1298349477429645352';
 
 new Responder({
     customId: "novos",
@@ -82,7 +82,7 @@ new Responder({
             const thread = await RESTInstance.post(Routes.threads(channelThreadId), {
                 body: {
                     name: threndTitle,
-                    type: 11,
+                    type: 12,
                 },
             }) as APIChannel;
 

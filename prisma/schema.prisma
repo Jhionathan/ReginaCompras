@@ -8,16 +8,17 @@ datasource db {
 }
 
 model solicitacao {
-  id             Int       @id @default(autoincrement())
-  requester      String
-  subtitle       String
-  description    String
-  ticket         String    @unique
-  typeproblem    String
-  createdAt      DateTime  @default(now())
-  finishedAt     DateTime?
-  finishedByUser String?
-  updatedAt      DateTime  @updatedAt
+  id                  Int       @id @default(autoincrement())
+  requester           String
+  subtitle            String
+  description         String
+  ticket              String    @unique
+  typeproblem         String
+  createdAt           DateTime  @default(now())
+  finishedAt          DateTime?
+  finishedByUser      String?
+  messagesRegister    Json?
+  updatedAt           DateTime  @updatedAt
 }
 
 model novos_produtos {
@@ -33,6 +34,7 @@ model novos_produtos {
   createdAt           DateTime  @default(now())
   finishedAt          DateTime?
   finishedByUser      String?
+  messagesRegister    Json?
   updatedAt           DateTime  @updatedAt
 }
 
@@ -49,5 +51,6 @@ model reposicao_produtos {
   createdAt           DateTime  @default(now())
   finishedAt          DateTime?
   finishedByUser      String?
+  messagesRegister    Json?
   updatedAt           DateTime  @updatedAt
 }

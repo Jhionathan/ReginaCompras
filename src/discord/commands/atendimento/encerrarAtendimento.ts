@@ -14,12 +14,10 @@ new Command({
     description: "Envie isso para encerrar o atendimento 🛒",
     type: ApplicationCommandType.ChatInput,
     defaultMemberPermissions: PermissionFlagsBits.ManageMessages,
-    dmPermission: false,
-
     async run(interaction) {
         try {
             //id do cargo
-            const allowedRoleId = "1293641175932080188"; // Substitua pelo ID do cargo permitido
+            const allowedRoleId = "1310664105610444820"; // Substitua pelo ID do cargo permitido
 
             // Verifica se o usuário tem o cargo permitido
             const member = interaction.member;
@@ -86,11 +84,44 @@ new Command({
                             console.error("Erro ao atualizar o banco de dados:", error);
                         }
 
-                    } else {
+                    } else if (chamadoName === "NP"){
 
                         try {
                             // Atualiza os dados do chamado no banco
                             const updatedChamado = await prisma.novos_produtos.update({
+                                where: {
+                                    ticket: chamadoNumber,
+                                },
+                                data: {
+                                    finishedAt: utcDate,
+                                    finishedByUser: userFinishTicket,
+                                },
+                            });
+    
+                            if (!updatedChamado) {
+                                console.log("Chamado não encontrado no banco de dados.");
+                                return;
+                            }
+    
+                            console.log(`Chamado ${chamadoNumber} encerrado com sucesso.`);
+    
+                            // Deleta a thread após 3 segundos
+                            setTimeout(async () => {
+                                try {
+                                    await channel.delete();
+                                    console.log(`Thread ${channel.id} deletada com sucesso.`);
+                                } catch (error) {
+                                    console.error("Erro ao deletar a thread:", error);
+                                }
+                            }, 3000);
+                        } catch (error) {
+                            console.error("Erro ao atualizar o banco de dados:", error);
+                        }
+                    } else {
+
+                        try {
+                            // Atualiza os dados do chamado no banco
+                            const updatedChamado = await prisma.reposicao_produtos.update({
                                 where: {
                                     ticket: chamadoNumber,
                                 },

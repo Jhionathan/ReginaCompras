@@ -31,7 +31,7 @@ COPY prisma ./prisma
 RUN npm install
 
 # Gerar os artefatos do Prisma
-RUN npx prisma generate --schema ./prisma/schema.prisma
+RUN npx prisma generate
 
 # Copiar o restante dos arquivos do projeto
 COPY . .
@@ -40,4 +40,6 @@ COPY . .
 RUN npm run build
 
 # Comando para rodar a aplicação
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+# CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+
+CMD [ "npm", "start" ]

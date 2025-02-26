@@ -1,12 +1,14 @@
 import { Responder, ResponderType } from "#base";
-import { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextChannel, Routes, TextInputStyle, REST } from "discord.js";
+import { ModalBuilder, TextInputBuilder, ActionRowBuilder, Routes, TextInputStyle, REST, MessageCollector, Message, ThreadChannel, } from "discord.js";
 import { ThreadsAPI } from "../../../api/thread.js";
 import { APIChannel } from "discord-api-types/v10";
 import { PrismaClient } from "@prisma/client";
 
 const RESTInstance = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 const threadsAPI = new ThreadsAPI(RESTInstance);
-const cargoId = "1293641175932080188";
+const cargoId = "1310664105610444820";
+const channelThreadId = '1310942001423843349';
+const activeCollectors: Map<string, { collector: MessageCollector; messages: { author: string; content: string; timestamp: string }[] }> = new Map();
 
 export function gerarNumeroTicket(): string {
     const timestamp = Date.now(); 
@@ -64,12 +66,11 @@ new Responder({
             const numeroTicket = gerarNumeroTicket();
 
             const threadTitle = `🚨🛒 SC - User: ${interaction.user.globalName} - ${numeroTicket}`;
-            const channelThreads = "1311319571420020777";
 
-            const thread = await RESTInstance.post(Routes.threads(channelThreads), {
+            const thread = await RESTInstance.post(Routes.threads(channelThreadId), {
                 body: {
                     name: threadTitle,
-                    type: 11, // THREAD_PRIVATE (exemplo de thread privada)
+                    type: 12, // THREAD_PRIVATE (exemplo de thread privada)
                 },
             }) as APIChannel;
 
@@ -77,7 +78,9 @@ new Responder({
 
             await threadsAPI.addMember(threadId, interaction.user.id);
 
-            const threadChannel = await interaction.client.channels.fetch(threadId) as TextChannel;
+            const threadChannel = (await interaction.client.channels.fetch(
+                threadId
+            )) as ThreadChannel;
             if (threadChannel) {
                 await threadChannel.send(
                     `<@&${cargoId}> 
@@ -103,31 +106,51 @@ new Responder({
                 console.error("Erro ao criar solicitacao no banco:", error);
             }
 
-            const channel = await interaction.client.channels.fetch("1311319571420020777") as TextChannel;
-            if (channel) {
-                await channel.send(
-                    `**Thread criada:** ${threadTitle}\n **Descrição:** ${descricao}\n **Data de criação:** ${new Date()}`
-                );
-            }
-
-            // Finalizar a interação com uma resposta ao usuário
-            await interaction.editReply({
-                content: "Sua solicitação foi registrada com sucesso e a thread foi criada.",
-            });
-        } catch (error) {
-            console.error("Erro ao processar a seleção ou criar thread:", error);
-            if (interaction.replied || interaction.deferred) {
-                // Atualizar a interação caso já tenha sido deferida
+            if (threadChannel) {
+                const collectedMessages: { author: string; content: string; timestamp: string }[] = [];;
+                const collector = threadChannel.createMessageCollector({});
+                activeCollectors.set(threadId, { collector: collector, messages: collectedMessages });
+        
+                collector.on("collect", (message: Message) => {
+                  collectedMessages.push({
+                    author: message.author.username,
+                    content: message.cleanContent,
+                    timestamp: message.createdTimestamp.toString(),
+                  });
+                  console.log(`📩 Mensagem coletada: ${message.author.tag}: ${message.content}`);
+                  console.log(`📊 Total de mensagens armazenadas: ${collectedMessages.length}`);
+                });
+        
+                collector.on("end", async () => {
+                  console.log(`Coleta finalizada. Total de mensagens: ${collectedMessages.length}`);
+        
+                  // Salvar as mensagens no banco de dados
+                  await prisma.solicitacao.update({
+                    where: { ticket: numeroTicket },
+                    data: { messagesRegister: collectedMessages }
+                  });
+                  console.log("📂 Mensagens salvas no banco de dados com sucesso!");
+        
+                  // activeCollectors.delete(threadId);
+                });
+              }
+              await interaction.editReply({
+                content:
+                  "Sua solicitação foi registrada com sucesso e a thread foi criada.",
+              });
+            } catch (error) {
+              console.error("Erro ao processar a seleção ou criar thread:", error);
+              if (interaction.replied || interaction.deferred) {
                 await interaction.editReply({
-                    content: "Ocorreu um erro ao processar sua solicitação.",
+                  content: "Ocorreu um erro ao processar sua solicitação.",
                 });
-            } else {
-                // Responder caso ainda não tenha sido deferida
+              } else {
                 await interaction.reply({
-                    content: "Ocorreu um erro ao processar sua solicitação.",
-                    ephemeral: true,
+                  content: "Ocorreu um erro ao processar sua solicitação.",
+                  ephemeral: true,
                 });
+              }
             }
-        }
-    },
-});
+          },
+        });
+        
